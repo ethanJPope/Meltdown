@@ -1,32 +1,39 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using System.Collections;
 
 /// <summary>
-/// Attach this to your Game Over UI Canvas (or an empty GameObject in that scene).
-/// Wire up the Restart and Quit buttons to these methods.
+/// Show "Game Over", display how many levels were completed, then return to home.
 /// </summary>
 public class GameOverManager : MonoBehaviour
 {
-    [Tooltip("Name of the main game scene to restart")]
-    public string mainSceneName = "Main";
+    [Tooltip("Name of the home/main menu scene.")]
+    public string homeSceneName = "Home";
 
-    /// <summary>
-    /// Call from your UI button to restart the game.
-    /// </summary>
-    public void RestartGame()
+    [Tooltip("Delay in seconds before returning to the home screen.")]
+    public float returnDelay = 2f;
+
+    [Tooltip("UI Text element for displaying the levels completed.")]
+    public Text levelsCompletedText;
+
+    private void Start()
     {
-        SceneManager.LoadScene(mainSceneName);
+        // Show how many levels the player completed
+        if (levelsCompletedText != null && GameManager.Instance != null)
+        {
+            levelsCompletedText.text = 
+                $"You completed {GameManager.Instance.levelsCompleted} level" +
+                $"{(GameManager.Instance.levelsCompleted == 1 ? "" : "s")}.";
+        }
+
+        // After a delay, go back to home
+        StartCoroutine(AutoReturnHome());
     }
 
-    /// <summary>
-    /// Call from your UI button to quit the application.
-    /// </summary>
-    public void QuitGame()
+    private IEnumerator AutoReturnHome()
     {
-        #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-        #else
-        Application.Quit();
-        #endif
+        yield return new WaitForSeconds(returnDelay);
+        SceneManager.LoadScene(homeSceneName);
     }
 }

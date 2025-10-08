@@ -203,6 +203,12 @@ public class LevelGenerator : MonoBehaviour
     private IEnumerator HandleWin()
     {
         yield return new WaitForSeconds(0.5f);
+
+        // Increment the completed-level count
+        if (GameManager.Instance != null)
+            GameManager.Instance.LevelCompleted();
+
+        // Generate the next level
         GenerateLevel();
     }
 
